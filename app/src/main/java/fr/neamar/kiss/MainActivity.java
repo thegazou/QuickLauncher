@@ -12,6 +12,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.Drawable;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,6 +42,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import ch.hearc.motioncontrol.ShakeDetector;
+import ch.hearc.motioncontrol.interfaces.OnShakeListener;
 import fr.neamar.kiss.adapter.RecordAdapter;
 import fr.neamar.kiss.pojo.Pojo;
 import fr.neamar.kiss.result.Result;
@@ -102,6 +106,19 @@ public class MainActivity extends ListActivity implements QueryInterface {
      * Task launched on text change
      */
     private Searcher searcher;
+
+
+
+    /*
+     * The following are used for the shake detection
+     */
+    private SensorManager mSensorManager;
+    private Sensor mAccelerometer;
+    private ShakeDetector mShakeDetector;
+
+
+
+
 
     /**
      * Called when the activity is first created.
@@ -222,6 +239,25 @@ public class MainActivity extends ListActivity implements QueryInterface {
 
         // Apply effects depending on current Android version
         applyDesignTweaks();
+
+        // ShakeDetector initialization
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mShakeDetector = new ShakeDetector();
+        mShakeDetector.setOnShakeListener(new OnShakeListener() {
+
+            @Override
+            public void onShake(int count) {
+                handleShakeEvent(count);
+            }
+        });
+
+
+    }
+
+    private void handleShakeEvent(int count) {
+        Toast toast = Toast.makeText(MainActivity.this, "We shake.", Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     /**
@@ -319,6 +355,9 @@ public class MainActivity extends ListActivity implements QueryInterface {
         }
 
         super.onResume();
+
+        // Add the following line to register the Session Manager Listener onResume
+        mSensorManager.registerListener(mShakeDetector, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
@@ -331,7 +370,11 @@ public class MainActivity extends ListActivity implements QueryInterface {
 
     @Override
     protected void onPause() {
+        // Add the following line to unregister the Sensor Manager onPause
+        mSensorManager.unregisterListener(mShakeDetector);
+
         super.onPause();
+
         KissApplication.getCameraHandler().releaseCamera();
     }
 
