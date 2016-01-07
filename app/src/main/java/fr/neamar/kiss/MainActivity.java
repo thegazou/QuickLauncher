@@ -22,12 +22,16 @@ import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextMenu;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.inputmethod.InputMethodManager;
@@ -42,9 +46,12 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import ch.hearc.motioncontrol.CustomGestureDetector;
 import ch.hearc.motioncontrol.ShakeDetector;
+import ch.hearc.motioncontrol.SwipeDetector;
 import ch.hearc.motioncontrol.interfaces.OnShakeListener;
 import fr.neamar.kiss.adapter.RecordAdapter;
+import fr.neamar.kiss.db.DB;
 import fr.neamar.kiss.pojo.Pojo;
 import fr.neamar.kiss.result.Result;
 import fr.neamar.kiss.searcher.ApplicationsSearcher;
@@ -54,7 +61,7 @@ import fr.neamar.kiss.searcher.QueryInterface;
 import fr.neamar.kiss.searcher.QuerySearcher;
 import fr.neamar.kiss.searcher.Searcher;
 
-public class MainActivity extends ListActivity implements QueryInterface {
+public class MainActivity extends ListActivity implements QueryInterface{
 
     public static final String START_LOAD = "fr.neamar.summon.START_LOAD";
     public static final String LOAD_OVER = "fr.neamar.summon.LOAD_OVER";
@@ -108,8 +115,7 @@ public class MainActivity extends ListActivity implements QueryInterface {
     private Searcher searcher;
 
 
-
-    /*
+    /**
      * The following are used for the shake detection
      */
     private SensorManager mSensorManager;
@@ -117,7 +123,11 @@ public class MainActivity extends ListActivity implements QueryInterface {
     private ShakeDetector mShakeDetector;
 
 
-
+    /**
+     * Gesture detector.
+     */
+    private GestureDetector gestureDetector;
+    private SwipeDetector swipeDetector;
 
 
     /**
@@ -178,6 +188,8 @@ public class MainActivity extends ListActivity implements QueryInterface {
 
         setContentView(R.layout.main);
 
+
+
         // Create adapter for records
         adapter = new RecordAdapter(this, this, R.layout.item_app, new ArrayList<Result>());
         setListAdapter(adapter);
@@ -219,6 +231,9 @@ public class MainActivity extends ListActivity implements QueryInterface {
         menuButton = findViewById(R.id.menuButton);
         registerForContextMenu(menuButton);
 
+        // TODO Add a swipe action.
+        // Here is the method to delete items from the list.
+        // Modify it in order to delete with a swipe.
         getListView().setLongClickable(true);
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
@@ -228,6 +243,14 @@ public class MainActivity extends ListActivity implements QueryInterface {
                 return true;
             }
         });
+
+        // Gesture detector initialization.
+        gestureDetector = new GestureDetector(this.getListView().getContext(), new CustomGestureDetector());
+        swipeDetector = new SwipeDetector();
+
+
+        // TODO Set on touch listener.
+        getListView().setOnTouchListener(swipeDetector);
 
         // Enable swiping
         if (prefs.getBoolean("enable-spellcheck", false)) {
@@ -256,7 +279,13 @@ public class MainActivity extends ListActivity implements QueryInterface {
     }
 
     private void handleShakeEvent(int count) {
-        Toast toast = Toast.makeText(MainActivity.this, "We shake.", Toast.LENGTH_SHORT);
+        // TODO DONE - Now we need to delete the history shown.
+
+        //getListView();
+        this.deleteDatabase(DB.DB_NAME);
+        KissApplication.resetDataHandler(this);
+        PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("layout-updated", true).commit();
+        Toast toast = Toast.makeText(MainActivity.this, "History Erased", Toast.LENGTH_SHORT);
         toast.show();
     }
 
@@ -670,4 +699,18 @@ public class MainActivity extends ListActivity implements QueryInterface {
         InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         mgr.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT);
     }
+
+    /**
+     * TODO - On Touch Event
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+        this.gestureDetector.onTouchEvent(event);
+        // Be sure to call the superclass implementation
+        return super.onTouchEvent(event);
+    }
+
+
 }
