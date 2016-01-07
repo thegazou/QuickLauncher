@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -78,7 +79,7 @@ public class RecordAdapter extends ArrayAdapter<Result> {
 
     public void onClick(final int position, View v) {
         final Result result;
-
+        Log.i("RecordAdapter","Got an on click @ " + position);
         try {
             result = results.get(position);
             result.launch(getContext(), v);
@@ -104,5 +105,10 @@ public class RecordAdapter extends ArrayAdapter<Result> {
         results.remove(result);
         result.deleteRecord(getContext());
         notifyDataSetChanged();
+    }
+
+    public void removeOnSwipe(final int position)
+    {
+        removeResult(results.get(position));
     }
 }

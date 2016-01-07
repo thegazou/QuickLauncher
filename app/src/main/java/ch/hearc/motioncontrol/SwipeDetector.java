@@ -3,11 +3,17 @@ package ch.hearc.motioncontrol;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ListAdapter;
+
+import fr.neamar.kiss.adapter.RecordAdapter;
 
 /**
  * Created by horia_000 on 07-Jan-16.
+ * Going to use https://github.com/daimajia/AndroidSwipeLayout instead.
  */
 public class SwipeDetector implements View.OnTouchListener {
+
+
     public static enum Action {
         LR, // Left to Right
         RL, // Right to Left
@@ -50,12 +56,12 @@ public class SwipeDetector implements View.OnTouchListener {
                     if (deltaX < 0) {
                         Log.i(logTag, "Swipe Left to Right");
                         mSwipeDetected = Action.LR;
-                        return true;
+                        return false;
                     }
                     if (deltaX > 0) {
                         Log.i(logTag, "Swipe Right to Left");
                         mSwipeDetected = Action.RL;
-                        return true;
+                        return false;
                     }
                 } else if (Math.abs(deltaY) > MIN_DISTANCE) { // vertical swipe
                     // detection

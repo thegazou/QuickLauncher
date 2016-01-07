@@ -234,6 +234,7 @@ public class MainActivity extends ListActivity implements QueryInterface{
         // TODO Add a swipe action.
         // Here is the method to delete items from the list.
         // Modify it in order to delete with a swipe.
+
         getListView().setLongClickable(true);
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
@@ -251,6 +252,7 @@ public class MainActivity extends ListActivity implements QueryInterface{
 
         // TODO Set on touch listener.
         getListView().setOnTouchListener(swipeDetector);
+
 
         // Enable swiping
         if (prefs.getBoolean("enable-spellcheck", false)) {
@@ -324,6 +326,7 @@ public class MainActivity extends ListActivity implements QueryInterface{
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
+        Log.d("MainActivity","onListItemClick + " + position);
         super.onListItemClick(l, v, position, id);
         adapter.onClick(position, v);
     }
