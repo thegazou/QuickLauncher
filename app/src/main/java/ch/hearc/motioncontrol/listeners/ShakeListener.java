@@ -1,4 +1,4 @@
-package ch.hearc.motioncontrol;
+package ch.hearc.motioncontrol.listeners;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -7,7 +7,7 @@ import android.util.FloatMath;
 
 import ch.hearc.motioncontrol.interfaces.OnShakeListener;
 
-public class ShakeDetector implements SensorEventListener {
+public class ShakeListener implements SensorEventListener {
 
     /*
      * The gForce that is necessary to register as shake.

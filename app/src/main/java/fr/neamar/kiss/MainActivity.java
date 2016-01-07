@@ -26,7 +26,6 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.GestureDetector;
-import android.view.GestureDetector.OnGestureListener;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,7 +37,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -46,9 +44,9 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import ch.hearc.motioncontrol.CustomGestureDetector;
-import ch.hearc.motioncontrol.ShakeDetector;
-import ch.hearc.motioncontrol.SwipeDetector;
+import ch.hearc.motioncontrol.listeners.ShakeListener;
+import ch.hearc.motioncontrol.listeners.not_used.SwipeDetector;
+import ch.hearc.motioncontrol.listeners.SwipeDismissListViewTouchListener;
 import ch.hearc.motioncontrol.interfaces.OnShakeListener;
 import fr.neamar.kiss.adapter.RecordAdapter;
 import fr.neamar.kiss.db.DB;
@@ -61,7 +59,7 @@ import fr.neamar.kiss.searcher.QueryInterface;
 import fr.neamar.kiss.searcher.QuerySearcher;
 import fr.neamar.kiss.searcher.Searcher;
 
-public class MainActivity extends ListActivity implements QueryInterface{
+public class MainActivity extends ListActivity implements QueryInterface {
 
     public static final String START_LOAD = "fr.neamar.summon.START_LOAD";
     public static final String LOAD_OVER = "fr.neamar.summon.LOAD_OVER";
@@ -120,7 +118,7 @@ public class MainActivity extends ListActivity implements QueryInterface{
      */
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
-    private ShakeDetector mShakeDetector;
+    private ShakeListener mShakeListener;
 
 
     /**
@@ -189,7 +187,6 @@ public class MainActivity extends ListActivity implements QueryInterface{
         setContentView(R.layout.main);
 
 
-
         // Create adapter for records
         adapter = new RecordAdapter(this, this, R.layout.item_app, new ArrayList<Result>());
         setListAdapter(adapter);
@@ -231,9 +228,6 @@ public class MainActivity extends ListActivity implements QueryInterface{
         menuButton = findViewById(R.id.menuButton);
         registerForContextMenu(menuButton);
 
-        // TODO Add a swipe action.
-        // Here is the method to delete items from the list.
-        // Modify it in order to delete with a swipe.
 
         getListView().setLongClickable(true);
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -245,13 +239,36 @@ public class MainActivity extends ListActivity implements QueryInterface{
             }
         });
 
-        // Gesture detector initialization.
-        gestureDetector = new GestureDetector(this.getListView().getContext(), new CustomGestureDetector());
-        swipeDetector = new SwipeDetector();
+        // Gesture detector initialization. TODO - Delete
+        //gestureDetector = new GestureDetector(this.getListView().getContext(), new CustomGestureDetector());
+        //swipeDetector = new SwipeDetector();
+        //getListView().setOnTouchListener(swipeDetector);
 
+        // Google Method - https://github.com/romannurik/Android-SwipeToDismiss
+        // Create a ListView-specific touch listener. ListViews are given special treatment because
+        // by default they handle touches for their list items... i.e. they're in charge of drawing
+        // the pressed state (the list selector), handling list item clicks, etc.
+        SwipeDismissListViewTouchListener touchListener =
+                new SwipeDismissListViewTouchListener(
+                        getListView(),
+                        new SwipeDismissListViewTouchListener.DismissCallbacks() {
+                            @Override
+                            public boolean canDismiss(int position) {
+                                return true;
+                            }
 
-        // TODO Set on touch listener.
-        getListView().setOnTouchListener(swipeDetector);
+                            @Override
+                            public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+                                for (int position : reverseSortedPositions) {
+                                    adapter.remove(adapter.getItem(position));
+                                }
+                                adapter.notifyDataSetChanged();
+                            }
+                        });
+        getListView().setOnTouchListener(touchListener);
+        // Setting this scroll listener is required to ensure that during ListView scrolling,
+        // we don't look for swipes.
+        getListView().setOnScrollListener(touchListener.makeScrollListener());
 
 
         // Enable swiping
@@ -265,11 +282,11 @@ public class MainActivity extends ListActivity implements QueryInterface{
         // Apply effects depending on current Android version
         applyDesignTweaks();
 
-        // ShakeDetector initialization
+        // ShakeListener initialization
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mShakeDetector = new ShakeDetector();
-        mShakeDetector.setOnShakeListener(new OnShakeListener() {
+        mShakeListener = new ShakeListener();
+        mShakeListener.setOnShakeListener(new OnShakeListener() {
 
             @Override
             public void onShake(int count) {
@@ -326,7 +343,7 @@ public class MainActivity extends ListActivity implements QueryInterface{
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        Log.d("MainActivity","onListItemClick + " + position);
+        Log.d("MainActivity", "onListItemClick + " + position);
         super.onListItemClick(l, v, position, id);
         adapter.onClick(position, v);
     }
@@ -389,7 +406,7 @@ public class MainActivity extends ListActivity implements QueryInterface{
         super.onResume();
 
         // Add the following line to register the Session Manager Listener onResume
-        mSensorManager.registerListener(mShakeDetector, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(mShakeListener, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
@@ -403,7 +420,7 @@ public class MainActivity extends ListActivity implements QueryInterface{
     @Override
     protected void onPause() {
         // Add the following line to unregister the Sensor Manager onPause
-        mSensorManager.unregisterListener(mShakeDetector);
+        mSensorManager.unregisterListener(mShakeListener);
 
         super.onPause();
 
@@ -653,14 +670,12 @@ public class MainActivity extends ListActivity implements QueryInterface{
         }
 
         if (query.length() == 0) {
-            if (prefs.getBoolean("history-hide", false))
-            {
+            if (prefs.getBoolean("history-hide", false)) {
                 searcher = new NullSearcher(this);
                 //Hide default scrollview
                 findViewById(R.id.main_empty).setVisibility(View.INVISIBLE);
 
-            }
-            else {
+            } else {
                 searcher = new HistorySearcher(this);
                 //Show default scrollview
                 findViewById(R.id.main_empty).setVisibility(View.VISIBLE);
@@ -705,11 +720,12 @@ public class MainActivity extends ListActivity implements QueryInterface{
 
     /**
      * TODO - On Touch Event
+     *
      * @param event
      * @return
      */
     @Override
-    public boolean onTouchEvent(MotionEvent event){
+    public boolean onTouchEvent(MotionEvent event) {
         this.gestureDetector.onTouchEvent(event);
         // Be sure to call the superclass implementation
         return super.onTouchEvent(event);

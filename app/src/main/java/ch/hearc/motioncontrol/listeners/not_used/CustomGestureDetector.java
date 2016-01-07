@@ -1,4 +1,4 @@
-package ch.hearc.motioncontrol;
+package ch.hearc.motioncontrol.listeners.not_used;
 
 import android.util.Log;
 import android.view.MotionEvent;

@@ -1,4 +1,4 @@
-package ch.hearc.motioncontrol;
+package ch.hearc.motioncontrol.listeners.not_used;
 
 import android.util.Log;
 import android.view.MotionEvent;
@@ -9,7 +9,8 @@ import fr.neamar.kiss.adapter.RecordAdapter;
 
 /**
  * Created by horia_000 on 07-Jan-16.
- * Going to use https://github.com/daimajia/AndroidSwipeLayout instead.
+ * Can detect swipes, but cannot determine item location easily.
+ * https://github.com/romannurik/Android-SwipeToDismiss
  */
 public class SwipeDetector implements View.OnTouchListener {
 
