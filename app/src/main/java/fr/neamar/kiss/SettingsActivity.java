@@ -56,6 +56,8 @@ public class SettingsActivity extends PreferenceActivity implements
             return;
         }
 
+
+
         if (!safeSettings.contains(key)) {
             // Reload the DataHandler since Providers preferences have changed
             KissApplication.resetDataHandler(this);

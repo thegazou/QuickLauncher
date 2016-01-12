@@ -7,6 +7,8 @@ import android.content.DialogInterface.OnClickListener;
 import android.preference.CheckBoxPreference;
 import android.util.AttributeSet;
 
+import java.util.prefs.PreferenceChangeListener;
+
 import fr.neamar.kiss.KissApplication;
 import fr.neamar.kiss.R;
 

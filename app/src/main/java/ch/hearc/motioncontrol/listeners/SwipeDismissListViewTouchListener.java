@@ -19,6 +19,7 @@ package ch.hearc.motioncontrol.listeners;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.os.SystemClock;
 import android.view.MotionEvent;
@@ -96,6 +97,7 @@ public class SwipeDismissListViewTouchListener implements View.OnTouchListener {
     private int mDownPosition;
     private View mDownView;
     private boolean mPaused;
+    SharedPreferences prefs;
 
     /**
      * The callback interface used by {@link SwipeDismissListViewTouchListener} to inform its client
@@ -125,7 +127,8 @@ public class SwipeDismissListViewTouchListener implements View.OnTouchListener {
      * @param callbacks The callback to trigger when the user has indicated that she would like to
      *                  dismiss one or more list items.
      */
-    public SwipeDismissListViewTouchListener(ListView listView, DismissCallbacks callbacks) {
+    public SwipeDismissListViewTouchListener(SharedPreferences prefs, ListView listView, DismissCallbacks callbacks) {
+        this.prefs=prefs;
         ViewConfiguration vc = ViewConfiguration.get(listView.getContext());
         mSlop = vc.getScaledTouchSlop();
         mMinFlingVelocity = vc.getScaledMinimumFlingVelocity() * 16;
@@ -168,7 +171,12 @@ public class SwipeDismissListViewTouchListener implements View.OnTouchListener {
     }
 
     @Override
-    public boolean onTouch(View view, MotionEvent motionEvent) {
+    public boolean onTouch(View view, MotionEvent motionEvent){
+        if (prefs.getBoolean("enable-swipe-item-to-erase-from-history",true)) {
+            setEnabled(true);
+        }else{
+            setEnabled(false);
+        }
         if (mViewWidth < 2) {
             mViewWidth = mListView.getWidth();
         }
@@ -364,8 +372,8 @@ public class SwipeDismissListViewTouchListener implements View.OnTouchListener {
                         dismissPositions[i] = mPendingDismisses.get(i).position;
                     }
                     mCallbacks.onDismiss(mListView, dismissPositions);
-                    
-                    // Reset mDownPosition to avoid MotionEvent.ACTION_UP trying to start a dismiss 
+
+                    // Reset mDownPosition to avoid MotionEvent.ACTION_UP trying to start a dismiss
                     // animation with a stale position
                     mDownPosition = ListView.INVALID_POSITION;
 

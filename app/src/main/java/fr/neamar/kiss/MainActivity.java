@@ -17,6 +17,7 @@ import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.text.Editable;
@@ -249,8 +250,7 @@ public class MainActivity extends ListActivity implements QueryInterface {
         // by default they handle touches for their list items... i.e. they're in charge of drawing
         // the pressed state (the list selector), handling list item clicks, etc.
         SwipeDismissListViewTouchListener touchListener =
-                new SwipeDismissListViewTouchListener(
-                        getListView(),
+                new SwipeDismissListViewTouchListener(prefs,getListView(),
                         new SwipeDismissListViewTouchListener.DismissCallbacks() {
                             @Override
                             public boolean canDismiss(int position) {
@@ -282,19 +282,18 @@ public class MainActivity extends ListActivity implements QueryInterface {
         // Apply effects depending on current Android version
         applyDesignTweaks();
 
-        // ShakeListener initialization
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mShakeListener = new ShakeListener();
-        mShakeListener.setOnShakeListener(new OnShakeListener() {
 
-            @Override
-            public void onShake(int count) {
-                handleShakeEvent(count);
-            }
-        });
+            // ShakeListener initialization
+            mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+            mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            mShakeListener = new ShakeListener();
+            mShakeListener.setOnShakeListener(prefs,new OnShakeListener() {
 
-
+                @Override
+                public void onShake(int count) {
+                    handleShakeEvent(count);
+                }
+            });
     }
 
     private void handleShakeEvent(int count) {
@@ -717,19 +716,5 @@ public class MainActivity extends ListActivity implements QueryInterface {
         InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         mgr.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT);
     }
-
-    /**
-     * TODO - On Touch Event
-     *
-     * @param event
-     * @return
-     */
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        this.gestureDetector.onTouchEvent(event);
-        // Be sure to call the superclass implementation
-        return super.onTouchEvent(event);
-    }
-
 
 }
