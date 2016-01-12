@@ -10,6 +10,18 @@
         </fr.neamar.kiss.preference.ResetPreference>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_ui">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="enable-shake-device-to-erase-history"
+            android:summary="@string/shake_device_to_erase_history_desc"
+            android:title="@string/shake_device_to_erase_history_name">
+        </CheckBoxPreference>
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="enable-swipe-item-to-erase-from-history"
+            android:summary="@string/swipe_item_to_erase_from_history_desc"
+            android:title="@string/swipe_item_to_erase_from_history_name">
+        </CheckBoxPreference>
         <ListPreference
             android:defaultValue="light"
             android:entries="@array/themesEntries"
