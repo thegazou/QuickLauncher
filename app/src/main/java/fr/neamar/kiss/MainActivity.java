@@ -240,11 +240,6 @@ public class MainActivity extends ListActivity implements QueryInterface {
             }
         });
 
-        // Gesture detector initialization. TODO - Delete
-        //gestureDetector = new GestureDetector(this.getListView().getContext(), new CustomGestureDetector());
-        //swipeDetector = new SwipeDetector();
-        //getListView().setOnTouchListener(swipeDetector);
-
         // Google Method - https://github.com/romannurik/Android-SwipeToDismiss
         // Create a ListView-specific touch listener. ListViews are given special treatment because
         // by default they handle touches for their list items... i.e. they're in charge of drawing
@@ -260,7 +255,8 @@ public class MainActivity extends ListActivity implements QueryInterface {
                             @Override
                             public void onDismiss(ListView listView, int[] reverseSortedPositions) {
                                 for (int position : reverseSortedPositions) {
-                                    adapter.remove(adapter.getItem(position));
+                                    // Remove the result.
+                                    adapter.removeResult(adapter.getItem(position));
                                 }
                                 adapter.notifyDataSetChanged();
                             }
@@ -296,10 +292,12 @@ public class MainActivity extends ListActivity implements QueryInterface {
             });
     }
 
+	/**
+	 * Handle the shake event.
+	 * In this case it will delete the history by resetting the data handler and the database.
+	 * @param count
+	 */
     private void handleShakeEvent(int count) {
-        // TODO DONE - Now we need to delete the history shown.
-
-        //getListView();
         this.deleteDatabase(DB.DB_NAME);
         KissApplication.resetDataHandler(this);
         PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("layout-updated", true).commit();
@@ -343,7 +341,7 @@ public class MainActivity extends ListActivity implements QueryInterface {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Log.d("MainActivity", "onListItemClick + " + position);
-        super.onListItemClick(l, v, position, id);
+	    super.onListItemClick(l, v, position, id);
         adapter.onClick(position, v);
     }
 
@@ -405,7 +403,7 @@ public class MainActivity extends ListActivity implements QueryInterface {
         super.onResume();
 
         // Add the following line to register the Session Manager Listener onResume
-        mSensorManager.registerListener(mShakeListener, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+	    mSensorManager.registerListener(mShakeListener, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
@@ -513,7 +511,7 @@ public class MainActivity extends ListActivity implements QueryInterface {
     public void onLauncherButtonClicked(View launcherButton) {
         // Display or hide the kiss bar, according to current view tag (showMenu / hideMenu).
 
-        displayKissBar(launcherButton.getTag().equals("showMenu"));
+	    displayKissBar(launcherButton.getTag().equals("showMenu"));
     }
 
     public void onFavoriteButtonClicked(View favorite) {
@@ -532,8 +530,9 @@ public class MainActivity extends ListActivity implements QueryInterface {
         }, KissApplication.TOUCH_DELAY);
     }
 
-    private void displayClearOnInput() {
-        final View clearButton = findViewById(R.id.clearButton);
+    private void displayClearOnInput()
+    {
+	    final View clearButton = findViewById(R.id.clearButton);
         if (searchEditText.getText().length() > 0) {
             clearButton.setVisibility(View.VISIBLE);
             menuButton.setVisibility(View.INVISIBLE);
@@ -549,7 +548,7 @@ public class MainActivity extends ListActivity implements QueryInterface {
         final View launcherButton = findViewById(R.id.launcherButton);
 
         int animationDuration = getResources().getInteger(
-                android.R.integer.config_longAnimTime);
+		        android.R.integer.config_longAnimTime);
 
         if (!display) {
             launcherButton.setVisibility(View.VISIBLE);
@@ -576,7 +575,7 @@ public class MainActivity extends ListActivity implements QueryInterface {
             }
         } else {
             launcherButton.setVisibility(View.INVISIBLE);
-            loaderBar.setVisibility(View.VISIBLE);
+	        loaderBar.setVisibility(View.VISIBLE);
         }
     }
 
