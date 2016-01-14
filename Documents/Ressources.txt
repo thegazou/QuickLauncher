@@ -1,0 +1,8 @@
+Ressources utilisées
+Ressources used:
+http://stackoverflow.com/questions/14398733/remove-item-listview-with-slide-like-gmail
+http://stackoverflow.com/questions/20797099/swipe-listview-item-from-right-to-left-show-delete-button
+https://plus.google.com/+RomanNurik/posts/Fgo1p5uWZLu & https://github.com/romannurik/Android-SwipeToDismiss
+https://github.com/daimajia/AndroidSwipeLayout & http://developer.android.com/training/material/lists-cards.html
+http://stackoverflow.com/questions/4373485/android-swipe-on-list/9340202#9340202
+http://software-workshop.eu/content/swiping-listview-elements
