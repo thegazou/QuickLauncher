@@ -17,7 +17,6 @@ import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.text.Editable;
@@ -26,12 +25,10 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextMenu;
-import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.inputmethod.InputMethodManager;
@@ -45,10 +42,9 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import ch.hearc.motioncontrol.listeners.ShakeListener;
-import ch.hearc.motioncontrol.listeners.not_used.SwipeDetector;
-import ch.hearc.motioncontrol.listeners.SwipeDismissListViewTouchListener;
 import ch.hearc.motioncontrol.interfaces.OnShakeListener;
+import ch.hearc.motioncontrol.listeners.ShakeListener;
+import ch.hearc.motioncontrol.listeners.SwipeDismissListViewTouchListener;
 import fr.neamar.kiss.adapter.RecordAdapter;
 import fr.neamar.kiss.db.DB;
 import fr.neamar.kiss.pojo.Pojo;
@@ -115,18 +111,11 @@ public class MainActivity extends ListActivity implements QueryInterface {
 
 
     /**
-     * The following are used for the shake detection
+     * TODO - The following are used for the shake detection.
      */
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private ShakeListener mShakeListener;
-
-
-    /**
-     * Gesture detector.
-     */
-    private GestureDetector gestureDetector;
-    private SwipeDetector swipeDetector;
 
 
     /**
@@ -187,7 +176,6 @@ public class MainActivity extends ListActivity implements QueryInterface {
 
         setContentView(R.layout.main);
 
-
         // Create adapter for records
         adapter = new RecordAdapter(this, this, R.layout.item_app, new ArrayList<Result>());
         setListAdapter(adapter);
@@ -240,7 +228,9 @@ public class MainActivity extends ListActivity implements QueryInterface {
             }
         });
 
-        // Google Method - https://github.com/romannurik/Android-SwipeToDismiss
+        // TODO - Swipe Dismiss ListViewTouchListener
+        // Google Method
+        // Source : https://github.com/romannurik/Android-SwipeToDismiss
         // Create a ListView-specific touch listener. ListViews are given special treatment because
         // by default they handle touches for their list items... i.e. they're in charge of drawing
         // the pressed state (the list selector), handling list item clicks, etc.
@@ -279,23 +269,25 @@ public class MainActivity extends ListActivity implements QueryInterface {
         applyDesignTweaks();
 
 
-            // ShakeListener initialization
-            mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-            mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            mShakeListener = new ShakeListener();
-            mShakeListener.setOnShakeListener(prefs,new OnShakeListener() {
+	    // TODO - ShakeListener initialization
+	    mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+	    mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+	    mShakeListener = new ShakeListener();
+	    mShakeListener.setOnShakeListener(prefs, new OnShakeListener()
+	    {
 
-                @Override
-                public void onShake(int count) {
-                    handleShakeEvent(count);
-                }
-            });
+		    @Override
+		    public void onShake(int count)
+		    {
+			    handleShakeEvent(count);
+		    }
+	    });
     }
 
 	/**
-	 * Handle the shake event.
+	 * TODO - Handle the shake event.
 	 * In this case it will delete the history by resetting the data handler and the database.
-	 * @param count
+	 * @param count The number of events. Not used.
 	 */
     private void handleShakeEvent(int count) {
         this.deleteDatabase(DB.DB_NAME);
@@ -402,21 +394,21 @@ public class MainActivity extends ListActivity implements QueryInterface {
 
         super.onResume();
 
-        // Add the following line to register the Session Manager Listener onResume
+        // TODO - Add the following line to register the Session Manager Listener onResume
 	    mSensorManager.registerListener(mShakeListener, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // unregister our receiver
+        // TODO - Unregister our receiver.
         this.unregisterReceiver(this.mReceiver);
         KissApplication.getCameraHandler().releaseCamera();
     }
 
     @Override
     protected void onPause() {
-        // Add the following line to unregister the Sensor Manager onPause
+        // TODO - Unregister the Sensor Manager onPause.
         mSensorManager.unregisterListener(mShakeListener);
 
         super.onPause();
@@ -661,7 +653,6 @@ public class MainActivity extends ListActivity implements QueryInterface {
      *
      * @param query the query on which to search
      */
-
     private void updateRecords(String query) {
         if (searcher != null) {
             searcher.cancel(true);
