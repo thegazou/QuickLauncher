@@ -105,12 +105,14 @@
     <string name="portrait_summary">Empêcher la rotation de l\'écran en mode paysage</string>
     <string name="portrait_title">Forcer le mode portrait</string>
     <string name="toggle_sync">Synchronisation</string>
-<string name="history_hide_name">Interface minimaliste</string>
+    <string name="history_hide_name">Interface minimaliste</string>
     <string name="history_hide_desc">Cacher l\'historique et l\'écran d\'introduction</string>
 
+    <string name="title_gesture">Gestes</string>
+
     <string name="shake_device_to_erase_history_desc">Autoriser l\'effacement de l\'historique en secouant l\'appareil</string>
-    <string name="shake_device_to_erase_history_name">Secouer l\'appareil pour effacer l\'hitorique</string>
+    <string name="shake_device_to_erase_history_name">Secouer l\'appareil pour effacer l\'historique</string>
 
     <string name="swipe_item_to_erase_from_history_desc">Autoriser l\'effacement d\'un élément de l\'historique en faisant un geste horizontal</string>
-    <string name="swipe_item_to_erase_from_history_name">Geste horizontal pour effacer un élément de l\'hitorique</string>
-    </resources>
+    <string name="swipe_item_to_erase_from_history_name">Geste horizontal pour effacer un élément de l\'historique</string>
+</resources>

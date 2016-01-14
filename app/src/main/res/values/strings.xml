@@ -106,6 +106,8 @@
     <string name="order_apps_name">App list order</string>
     <string name="order_apps_desc">A to Z or Z to A</string>
 
+    <string name="title_gesture">Gesture</string>
+
     <string name="shake_device_to_erase_history_desc">Allow a shake to erase the history</string>
     <string name="shake_device_to_erase_history_name">Shake device to erase history</string>
 
